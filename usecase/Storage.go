@@ -1,6 +1,6 @@
 package usecase
 
-import "firswap/sms-api/actor"
+import "siji/sms-api/actor"
 
 type (
 	MessageStatusRepository interface {

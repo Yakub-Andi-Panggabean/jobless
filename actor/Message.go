@@ -4,7 +4,7 @@ import (
 	"github.com/sirupsen/logrus"
 	"math"
 	"time"
-	"firswap/sms-api/usecase"
+	"siji/sms-api/usecase"
 )
 
 var log logrus.Logger

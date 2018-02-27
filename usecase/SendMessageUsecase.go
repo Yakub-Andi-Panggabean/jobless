@@ -2,7 +2,7 @@ package usecase
 
 import (
 	"bytes"
-	"firswap/sms-api/actor"
+	"siji/sms-api/actor"
 	"math/rand"
 	"time"
 )
