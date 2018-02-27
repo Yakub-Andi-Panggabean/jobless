@@ -1,0 +1,6 @@
+{
+	"ImportPath": "firswap/sms-api",
+	"GoVersion": "go1.9",
+	"GodepVersion": "v80",
+	"Deps": []
+}
