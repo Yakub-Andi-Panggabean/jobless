@@ -17,7 +17,7 @@ type (
 		UpdateUser(u actor.SmsApiUser) (int, error)
 		DeleteUser(u actor.SmsApiUser) (int, error)
 		FindUser(id string) (*actor.SmsApiUser, error)
-		FindAuthenticatedUser(username string,password string) (*actor.SmsApiUser, error)
+		FindAuthenticatedUser(username string, password string) (*actor.SmsApiUser, error)
 		FindUsers(limit int) []*actor.SmsApiUser
 	}
 
@@ -45,5 +45,13 @@ type (
 		IsMessageLogExist(id string) bool
 		FindMessageLog(id string) (*actor.UserMessageLog, error)
 		FindMessagesLog(limit int) []*actor.UserMessageLog
+	}
+
+	StorageFactory interface {
+		NewMessageStatusRepository() MessageStatusRepository
+		NewUserRepository() UserRepository
+		NewSenderRepository() SenderRepository
+		NewMessageStatusV1Repository() MessageStatusv1Repository
+		NewMessageLogRepository() MessageLogRepository
 	}
 )

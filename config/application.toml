@@ -9,5 +9,9 @@ format="2006-01-02 15:04:05.00"
 count=5
 
 [queue]
+user="guest"
+password="guest"
+address="localhost"
+port="15672"
 [queue.exchange]
 name="IncomingExchange"

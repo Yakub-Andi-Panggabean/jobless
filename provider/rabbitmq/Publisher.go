@@ -5,6 +5,7 @@ import (
 	"github.com/streadway/amqp"
 	"siji/sms-api/actor"
 	"siji/sms-api/util"
+	"strings"
 )
 
 var log logrus.Logger
@@ -22,7 +23,7 @@ var connection *amqp.Connection
 
 func init() {
 	log = logrus.New()
-	conn, err := amqp.Dial("")
+	conn, err := amqp.Dial(generateRabbitMQUrl())
 	if err != nil {
 		panic("could not make connection to rabbitmq," + err.Error())
 	} else {
@@ -31,8 +32,9 @@ func init() {
 
 }
 
-func (m *MessagePublisher) publish(message string) {
+func (m *MessagePublisher) publish(message string) error {
 
+	var errorVal error
 	exchangeName := util.GetConfig().GetString("queue.exchange.incoming")
 
 	channel, err := connection.Channel()
@@ -40,6 +42,7 @@ func (m *MessagePublisher) publish(message string) {
 	if err != nil {
 
 		log.Warn("failed to create channel, err:", err.Error())
+		errorVal = err
 
 	} else {
 
@@ -47,7 +50,8 @@ func (m *MessagePublisher) publish(message string) {
 
 		if errExchange != nil {
 
-			log.Warn("failed to declare exchange, err:", err.Error())
+			log.Warn("failed to declare exchange, err:", errExchange.Error())
+			errorVal = errExchange
 
 		} else {
 
@@ -61,13 +65,35 @@ func (m *MessagePublisher) publish(message string) {
 
 	}
 
+	return errorVal
+
 }
 
-func (m *MessagePublisher) save(u actor.UserMessageStatus) (int, error) {
+func (m *MessagePublisher) SaveMessage(u actor.UserMessageStatus) (int, error) {
 
-	var err error
 	var result int
 
+	err := m.publish(util.ConvertToJson(u))
+
+	if err != nil {
+		result = 0
+	} else {
+		result = 1
+	}
+
 	return result, err
+
+}
+
+func generateRabbitMQUrl() string {
+
+	url := "amqp://{username}:{password}@{host}:{port}/"
+
+	url = strings.Replace(url, "{username}", util.GetConfig().GetString("queue.user"), 1)
+	url = strings.Replace(url, "{password}", util.GetConfig().GetString("queue.password"), 1)
+	url = strings.Replace(url, "{host}", util.GetConfig().GetString("queue.host"), 1)
+	url = strings.Replace(url, "{port}", util.GetConfig().GetString("queue.port"), 1)
+
+	return url
 
 }

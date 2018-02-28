@@ -29,6 +29,7 @@ type (
 		BroadcastSmsId int       `json:"broadcastSmsId"`
 		UserId         string    `json:"userId"`
 		SenderId       string    `json:"senderId"`
+		Type           MessageType
 	}
 
 	UserMessageStatusV1 struct {

@@ -1,6 +1,7 @@
 package usecase
 
 import ()
+import "sync"
 
 type (
 	MessageUsecase interface {
@@ -17,3 +18,20 @@ type (
 		SenderRepo          SenderRepository
 	}
 )
+
+var (
+	messageInstance    Message
+	messageInstaceOnce sync.Once
+)
+
+func (f *factory) NewMessageStatusRepository() MessageStatusRepository {
+
+	messageInstaceOnce.Do(func() {
+
+		//messageInstance:={
+
+		//}
+
+	})
+
+}
