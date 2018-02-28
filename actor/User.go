@@ -1,8 +1,8 @@
 package actor
 
 import (
-	"github.com/sirupsen/logrus"
 	//"strconv"
+	"github.com/sirupsen/logrus"
 	"time"
 )
 
@@ -27,6 +27,7 @@ type (
 
 	SmsApiUser struct {
 		Actor
+		UserId            int
 		Version           int
 		Username          string
 		Password          string

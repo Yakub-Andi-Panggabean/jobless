@@ -17,6 +17,7 @@ type (
 		UpdateUser(u actor.SmsApiUser) (int, error)
 		DeleteUser(u actor.SmsApiUser) (int, error)
 		FindUser(id string) (*actor.SmsApiUser, error)
+		FindAuthenticatedUser(username string,password string) (*actor.SmsApiUser, error)
 		FindUsers(limit int) []*actor.SmsApiUser
 	}
 

@@ -1,17 +1,10 @@
 package actor
 
 import (
-	"github.com/sirupsen/logrus"
-	"math"
 	"time"
-	"siji/sms-api/usecase"
 )
 
-var log logrus.Logger
-
 func init() {
-
-	log = logrus.New()
 
 }
 
@@ -24,24 +17,18 @@ const (
 )
 
 type (
-
-
 	UserMessageStatus struct {
 		Actor
-		MessageId        string
-		Destination      string
-		MessageStatus    string
-		SentTime         time.Time
-		StatusTime       time.Time
-		Message          string
-		Type             MessageType
-		Acknowledged     bool
-		BroadcastSmsId   int
-		UserId           string
-		SenderId         string
-		ErrorCode        string
-		ErrorDescription string
-		Index            int
+		MessageId      string    `json:"messageId"`
+		Destination    string    `json:"destination"`
+		MessageStatus  string    `json:"messageStatus"`
+		SentTime       time.Time `json:"sendDateTime"`
+		StatusTime     time.Time `json:"statusDateTime"`
+		Message        string    `json:"message"`
+		Acknowledged   bool      `json:"acknowledged"`
+		BroadcastSmsId int       `json:"broadcastSmsId"`
+		UserId         string    `json:"userId"`
+		SenderId       string    `json:"senderId"`
 	}
 
 	UserMessageStatusV1 struct {
@@ -87,59 +74,3 @@ type (
 		LongRangeUpper   int64
 	}
 )
-
-/*
-
-get sms count
-
-*/
-func (m usecase.MessageRequest) GetSmsCount() int {
-
-	if m.Type == BINARY {
-		return math.Ceil(float64(len(m.MessageContent))+40) / 140
-	}
-
-	//is long sms
-	if len(m.MessageContent) > 160 {
-		return 1
-	}
-
-	// is split sms
-	if m.IsSplitSms {
-		return math.Ceil(float64(len(m.MessageContent) / 160))
-	}
-
-	return math.Ceil(float64(len(m.MessageContent) / 153))
-}
-
-func (m usecase.MessageRequest) IsValidMessage() bool {
-
-	var isValid bool
-
-	if nil != m.Username && m.Username != "" {
-
-		log.Infof("Username is required")
-
-	} else if nil != m.Password && m.Password != "" {
-
-		log.Infof("Password is required")
-
-	} else if nil != m.SenderId && m.SenderId != "" {
-
-		log.Infof("SenderId is required")
-
-	} else if nil != m.Destination && m.Destination != "" {
-
-		log.Infof("Destination is required")
-
-	} else if nil != m.MessageContent && m.MessageContent != "" {
-
-		log.Infof("Message Content is required")
-
-	} else {
-		isValid = true
-	}
-
-	return isValid
-
-}
