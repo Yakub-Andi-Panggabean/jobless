@@ -13,7 +13,7 @@ var log logrus.Logger
 type (
 	MessagePublisher struct {
 		Address  string
-		port     int
+		Port     int
 		Username string
 		Password string
 	}
@@ -32,10 +32,10 @@ func init() {
 
 }
 
-func (m *MessagePublisher) publish(message string) error {
+func (m *MessagePublisher) Publish(message string, exchange string, exchangeType string) error {
 
 	var errorVal error
-	exchangeName := util.GetConfig().GetString("queue.exchange.incoming")
+	//exchangeName := util.GetConfig().GetString("queue.exchange.incoming")
 
 	channel, err := connection.Channel()
 
@@ -46,7 +46,7 @@ func (m *MessagePublisher) publish(message string) error {
 
 	} else {
 
-		errExchange := channel.ExchangeDeclare(exchangeName, amqp.ExchangeFanout, true, false, false, false, nil)
+		errExchange := channel.ExchangeDeclare(exchange, exchangeType, true, false, false, false, nil)
 
 		if errExchange != nil {
 
@@ -55,7 +55,7 @@ func (m *MessagePublisher) publish(message string) error {
 
 		} else {
 
-			channel.Publish(exchangeName, "", false, false, amqp.Publishing{
+			channel.Publish(exchange, "", false, false, amqp.Publishing{
 				DeliveryMode: amqp.Persistent,
 				ContentType:  "application/json",
 				Body:         []byte(message),
@@ -66,22 +66,6 @@ func (m *MessagePublisher) publish(message string) error {
 	}
 
 	return errorVal
-
-}
-
-func (m *MessagePublisher) SaveMessage(u actor.UserMessageStatus) (int, error) {
-
-	var result int
-
-	err := m.publish(util.ConvertToJson(u))
-
-	if err != nil {
-		result = 0
-	} else {
-		result = 1
-	}
-
-	return result, err
 
 }
 

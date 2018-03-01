@@ -1,16 +1,14 @@
 package usecase
 
-import ()
 import "sync"
 
 type (
 	MessageUsecase interface {
-		SendMessage(m MessageRequest) (string, error)
-		GenerateMessageId() string
+		SendMessage(r MessageRequest) (string, error)
+		GenerateMessageId(r MessageRequest) string
 	}
 
 	Message struct {
-		Request             MessageRequest
 		MessageStatusV1Repo MessageStatusv1Repository
 		MessageStatusRepo   MessageStatusRepository
 		MessageLogRepo      MessageLogRepository
@@ -20,18 +18,29 @@ type (
 )
 
 var (
-	messageInstance    Message
-	messageInstaceOnce sync.Once
+	MessageUsecaseInstance MessageUsecase
+	messageInstaceOnce     sync.Once
 )
 
-func (f *factory) NewMessageStatusRepository() MessageStatusRepository {
+/**
+
+create new instance of MessageUsecase interface
+
+*/
+func (f *factory) NewMessageUsecase() MessageUsecase {
 
 	messageInstaceOnce.Do(func() {
 
-		//messageInstance:={
-
-		//}
+		MessageUsecaseInstance = Message{
+			MessageStatusRepo:   f.NewMessageStatusRepository(),
+			UserRepo:            f.NewUserRepository(),
+			SenderRepo:          f.NewSenderRepository(),
+			MessageLogRepo:      f.NewMessageLogRepository(),
+			MessageStatusV1Repo: f.NewMessageStatusV1Repository(),
+		}
 
 	})
+
+	return MessageUsecaseInstance
 
 }

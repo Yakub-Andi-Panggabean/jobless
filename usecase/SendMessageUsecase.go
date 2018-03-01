@@ -37,22 +37,22 @@ type (
 	}
 )
 
-func (m *Message) SendMessage() (string, error) {
+func (m *Message) SendMessage(r MessageRequest) (string, error) {
 
 	var err error
 	var transactionId string
 
-	sender, errSender := m.SenderRepo.FindSender(m.Request.SenderId)
-	user, errUser := m.UserRepo.FindAuthenticatedUser(m.Request.Username, m.Request.Password)
+	sender, errSender := m.SenderRepo.FindSender(r.SenderId)
+	user, errUser := m.UserRepo.FindAuthenticatedUser(r.Username, r.Password)
 
 	if errSender != nil {
 		err = errSender
 	} else {
 
 		//process sms api v1 request
-		if m.Request.ApiVersion == SMS_API_V1 {
+		if r.ApiVersion == SMS_API_V1 {
 
-			transactionId = m.sendSmsV1(sender)
+			transactionId = m.sendSmsV1(sender, r)
 
 		} else {
 
@@ -62,7 +62,7 @@ func (m *Message) SendMessage() (string, error) {
 
 			} else {
 
-				transactionId = m.sendSmsV2(sender, user)
+				transactionId = m.sendSmsV2(sender, user, r)
 
 			}
 		}
@@ -73,7 +73,7 @@ func (m *Message) SendMessage() (string, error) {
 
 }
 
-func (m *Message) sendSmsV1(sender actor.Sender) string {
+func (m *Message) sendSmsV1(sender actor.Sender, r MessageRequest) string {
 
 	var senderValue string
 
@@ -84,11 +84,11 @@ func (m *Message) sendSmsV1(sender actor.Sender) string {
 	}
 
 	statV1 := actor.UserMessageStatusV1{
-		Message:       m.Request.MessageContent,
-		Destination:   m.Request.Destination,
-		Username:      m.Request.Username,
-		Type:          m.Request.Type,
-		MessageId:     m.GenerateMessageId(),
+		Message:       r.MessageContent,
+		Destination:   r.Destination,
+		Username:      r.Username,
+		Type:          r.Type,
+		MessageId:     m.GenerateMessageId(r),
 		SenderName:    senderValue,
 		Status:        "", //initial state of message status
 		SendTimeStamp: time.Now(),
@@ -109,16 +109,16 @@ func (m *Message) sendSmsV1(sender actor.Sender) string {
 	return statV1.MessageId
 }
 
-func (m *Message) sendSmsV2(sender actor.Sender, user actor.SmsApiUser) string {
+func (m *Message) sendSmsV2(sender actor.Sender, user actor.SmsApiUser, r MessageRequest) string {
 
 	statv2 := actor.UserMessageStatus{
-		Message:        m.Request.MessageContent,
-		Type:           m.Request.Type,
-		MessageId:      m.GenerateMessageId(),
+		Message:        r.MessageContent,
+		Type:           r.Type,
+		MessageId:      m.GenerateMessageId(r),
 		SenderId:       sender.SenderId,
-		Destination:    m.Request.Destination,
+		Destination:    r.Destination,
 		Acknowledged:   nil,
-		BroadcastSmsId: m.Request.Broadcast,
+		BroadcastSmsId: r.Broadcast,
 		MessageStatus:  "",
 		SentTime:       time.Now(),
 		StatusTime:     nil,
@@ -138,17 +138,17 @@ func (m *Message) sendSmsV2(sender actor.Sender, user actor.SmsApiUser) string {
   Generate Message Id
 
 */
-func (m *Message) GenerateMessageId() string {
+func (m *Message) GenerateMessageId(r MessageRequest) string {
 
 	var prefix string
 	time := time.Now().Format(util.GetConfig().GetString("date.format"))
 
 	var buffer bytes.Buffer
 
-	if m.Request.Type == actor.BINARY {
+	if r.Type == actor.BINARY {
 		prefix = "2GPI"
 	} else {
-		if m.Request.ApiVersion == SMS_API_V1 {
+		if r.ApiVersion == SMS_API_V1 {
 			prefix = "0GPI"
 		} else {
 			prefix = util.GetConfig().GetString("transaction.prefix")
@@ -190,46 +190,41 @@ func randSeq(n int) string {
 get sms count
 
 */
-func (m *Message) GetSmsCount() int {
+func (m *Message) GetSmsCount(r MessageRequest) int {
 
-	if m.Request.Type == actor.BINARY {
-		return math.Ceil(float64(len(m.Request.MessageContent))+40) / 140
-	}
-
-	//is long sms
-	if len(m.Request.MessageContent) > 160 {
+	if r.Type == actor.BINARY {
+		return math.Ceil(float64(len(r.MessageContent))+40) / 140
+	} else if len(r.MessageContent) > 160 { //is long sms
 		return 1
+	} else if r.IsSplitSms { // is split sms
+		return math.Ceil(float64(len(r.MessageContent) / 160))
+	} else {
+		return math.Ceil(float64(len(r.MessageContent) / 153))
 	}
 
-	// is split sms
-	if m.Request.IsSplitSms {
-		return math.Ceil(float64(len(m.Request.MessageContent) / 160))
-	}
-
-	return math.Ceil(float64(len(m.Request.MessageContent) / 153))
 }
 
-func (m *Message) IsValidMessage() bool {
+func (m *Message) IsValidMessage(r MessageRequest) bool {
 
 	var isValid bool
 
-	if nil != m.Request.Username && m.Request.Username != "" {
+	if nil != r.Username && r.Username != "" {
 
 		log.Infof("Username is required")
 
-	} else if nil != m.Request.Password && m.Request.Password != "" {
+	} else if nil != r.Password && r.Password != "" {
 
 		log.Infof("Password is required")
 
-	} else if nil != m.Request.SenderId && m.Request.SenderId != "" {
+	} else if nil != r.SenderId && r.SenderId != "" {
 
 		log.Infof("SenderId is required")
 
-	} else if nil != m.Request.Destination && m.Request.Destination != "" {
+	} else if nil != r.Destination && r.Destination != "" {
 
 		log.Infof("Destination is required")
 
-	} else if nil != m.Request.MessageContent && m.Request.MessageContent != "" {
+	} else if nil != r.MessageContent && r.MessageContent != "" {
 
 		log.Infof("Message Content is required")
 
