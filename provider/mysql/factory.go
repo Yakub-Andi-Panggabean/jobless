@@ -1,16 +1,23 @@
 package mysql
 
 import (
+	"database/sql"
+	_ "github.com/go-sql-driver/mysql"
+	"github.com/revel/modules/db/app"
 	"siji/sms-api/usecase"
+	"siji/sms-api/util"
+	"strconv"
 	"sync"
 )
 
 type (
 	storageFactory struct {
+		db *sql.DB
 	}
 )
 
 var (
+	storage                           storageFactory
 	messageStatusRepositoryInstance   usecase.MessageStatusRepository
 	messageStatusRepoOnce             sync.Once
 	userRepositoryInstance            usecase.UserRepository
@@ -25,11 +32,28 @@ var (
 
 func NewStorage() usecase.StorageFactory {
 
-	return storageFactory{}
+	driver := util.GetConfig().GetString("db.driver")
+	username := util.GetConfig().GetString("db.user")
+	password := util.GetConfig().GetString("db.password")
+	dbname := util.GetConfig().GetString("db.name")
+	dbport := util.GetConfig().GetInt("db.port")
+	dbaddress := util.GetConfig().GetString("db.address")
+
+	db, err := sql.Open(driver, username+":"+password+"@tcp("+dbaddress+":"+strconv.Itoa(dbport)+")/"+dbname)
+
+	if err != nil {
+
+		panic("an error when trying to connect to database :" + err.Error())
+
+	}
+
+	storage.db = db
+
+	return storage
 
 }
 
-func (s *storageFactory) NewMessageStatusRepository() usecase.MessageStatusRepository {
+func (s storageFactory) NewMessageStatusRepository() usecase.MessageStatusRepository {
 
 	messageStatusRepoOnce.Do(func() {
 		messageStatusRepositoryInstance = NewMessageStatusRepoImpl()
@@ -38,37 +62,37 @@ func (s *storageFactory) NewMessageStatusRepository() usecase.MessageStatusRepos
 	return messageStatusRepositoryInstance
 }
 
-func (s *storageFactory) NewUserRepository() usecase.UserRepository {
+func (s storageFactory) NewUserRepository() usecase.UserRepository {
 
 	userRepositoryOnce.Do(func() {
-		userRepositoryInstance = NewUserRepoImpl()
+		userRepositoryInstance = NewUserRepoImpl(db.Db)
 	})
 
 	return userRepositoryInstance
 }
 
-func (s *storageFactory) NewSenderRepository() usecase.SenderRepository {
+func (s storageFactory) NewSenderRepository() usecase.SenderRepository {
 
 	senderRepositoryOnce.Do(func() {
-		senderRepositoryOnce = NewSenderRepoImpl()
+		senderRepositoryInstance = NewSenderRepoImpl()
 	})
 
 	return senderRepositoryInstance
 }
 
-func (s *storageFactory) NewMessageStatusV1Repository() usecase.MessageStatusv1Repository {
+func (s storageFactory) NewMessageStatusV1Repository() usecase.MessageStatusv1Repository {
 
 	messageStatusv1RepositoryOnce.Do(func() {
-		messageStatusv1RepositoryOnce = NewMessageStatusV1RepoImpl()
+		messageStatusv1RepositoryInstance = NewMessageStatusV1RepoImpl()
 	})
 
 	return messageStatusv1RepositoryInstance
 }
 
-func (s *storageFactory) NewMessageLogRepository() usecase.MessageLogRepository {
+func (s storageFactory) NewMessageLogRepository() usecase.MessageLogRepository {
 
 	messageLogRepositoryOnce.Do(func() {
-		messageLogRepositoryOnce = NewMessageLogRepoImpl()
+		messageLogRepositoryInstance = NewMessageLogRepoImpl()
 	})
 
 	return messageLogRepositoryInstance

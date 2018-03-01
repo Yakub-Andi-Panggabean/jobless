@@ -5,11 +5,11 @@ import (
 	"github.com/sirupsen/logrus"
 )
 
-var log logrus.Logger
+var logger *logrus.Logger
 
 func init() {
 
-	log = logrus.New()
+	logger = logrus.New()
 
 }
 
@@ -19,8 +19,8 @@ func ConvertToJson(p interface{}) string {
 
 	if err != nil {
 
-		log.Error("failed to convert object to json ,err :", err)
-		return nil
+		logger.Error("failed to convert object to json ,err :", err)
+		return ""
 
 	} else {
 

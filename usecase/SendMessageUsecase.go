@@ -10,7 +10,7 @@ import (
 	"time"
 )
 
-var log logrus.Logger
+var log *logrus.Logger
 
 func init() {
 	log = logrus.New()
@@ -37,13 +37,13 @@ type (
 	}
 )
 
-func (m *Message) SendMessage(r MessageRequest) (string, error) {
+func (m message) SendMessage(r MessageRequest) (string, error) {
 
 	var err error
 	var transactionId string
 
-	sender, errSender := m.SenderRepo.FindSender(r.SenderId)
 	user, errUser := m.UserRepo.FindAuthenticatedUser(r.Username, r.Password)
+	sender, errSender := m.SenderRepo.FindSender(r.SenderId)
 
 	if errSender != nil {
 		err = errSender
@@ -52,7 +52,7 @@ func (m *Message) SendMessage(r MessageRequest) (string, error) {
 		//process sms api v1 request
 		if r.ApiVersion == SMS_API_V1 {
 
-			transactionId = m.sendSmsV1(sender, r)
+			transactionId = m.sendSmsV1(*sender, r)
 
 		} else {
 
@@ -62,7 +62,7 @@ func (m *Message) SendMessage(r MessageRequest) (string, error) {
 
 			} else {
 
-				transactionId = m.sendSmsV2(sender, user, r)
+				transactionId = m.sendSmsV2(*sender, *user, r)
 
 			}
 		}
@@ -73,11 +73,11 @@ func (m *Message) SendMessage(r MessageRequest) (string, error) {
 
 }
 
-func (m *Message) sendSmsV1(sender actor.Sender, r MessageRequest) string {
+func (m message) sendSmsV1(sender actor.Sender, r MessageRequest) string {
 
 	var senderValue string
 
-	if sender.SenderName != nil {
+	if sender.SenderName != "" {
 		senderValue = sender.SenderName
 	} else {
 		senderValue = sender.SenderId
@@ -109,7 +109,7 @@ func (m *Message) sendSmsV1(sender actor.Sender, r MessageRequest) string {
 	return statV1.MessageId
 }
 
-func (m *Message) sendSmsV2(sender actor.Sender, user actor.SmsApiUser, r MessageRequest) string {
+func (m message) sendSmsV2(sender actor.Sender, user actor.SmsApiUser, r MessageRequest) string {
 
 	statv2 := actor.UserMessageStatus{
 		Message:        r.MessageContent,
@@ -117,11 +117,10 @@ func (m *Message) sendSmsV2(sender actor.Sender, user actor.SmsApiUser, r Messag
 		MessageId:      m.GenerateMessageId(r),
 		SenderId:       sender.SenderId,
 		Destination:    r.Destination,
-		Acknowledged:   nil,
-		BroadcastSmsId: r.Broadcast,
+		Acknowledged:   false,
+		BroadcastSmsId: r.Broadcast.BroadcastSmsId,
 		MessageStatus:  "",
 		SentTime:       time.Now(),
-		StatusTime:     nil,
 		UserId:         user.Username,
 	}
 
@@ -138,7 +137,7 @@ func (m *Message) sendSmsV2(sender actor.Sender, user actor.SmsApiUser, r Messag
   Generate Message Id
 
 */
-func (m *Message) GenerateMessageId(r MessageRequest) string {
+func (m message) GenerateMessageId(r MessageRequest) string {
 
 	var prefix string
 	time := time.Now().Format(util.GetConfig().GetString("date.format"))
@@ -155,10 +154,10 @@ func (m *Message) GenerateMessageId(r MessageRequest) string {
 		}
 	}
 
-	buffer.Write(prefix)
-	buffer.Write(time)
-	buffer.Write(".")
-	buffer.Write(randSeq(5))
+	buffer.WriteString(prefix)
+	buffer.WriteString(time)
+	buffer.WriteString(".")
+	buffer.WriteString(randSeq(5))
 
 	return buffer.String()
 
@@ -190,41 +189,41 @@ func randSeq(n int) string {
 get sms count
 
 */
-func (m *Message) GetSmsCount(r MessageRequest) int {
+func (m message) GetSmsCount(r MessageRequest) int {
 
 	if r.Type == actor.BINARY {
-		return math.Ceil(float64(len(r.MessageContent))+40) / 140
+		return int(math.Ceil(float64(len(r.MessageContent))+40) / 140)
 	} else if len(r.MessageContent) > 160 { //is long sms
 		return 1
 	} else if r.IsSplitSms { // is split sms
-		return math.Ceil(float64(len(r.MessageContent) / 160))
+		return int(math.Ceil(float64(len(r.MessageContent) / 160)))
 	} else {
-		return math.Ceil(float64(len(r.MessageContent) / 153))
+		return int(math.Ceil(float64(len(r.MessageContent) / 153)))
 	}
 
 }
 
-func (m *Message) IsValidMessage(r MessageRequest) bool {
+func (m message) IsValidMessage(r MessageRequest) bool {
 
 	var isValid bool
 
-	if nil != r.Username && r.Username != "" {
+	if r.Username != "" {
 
 		log.Infof("Username is required")
 
-	} else if nil != r.Password && r.Password != "" {
+	} else if r.Password != "" {
 
 		log.Infof("Password is required")
 
-	} else if nil != r.SenderId && r.SenderId != "" {
+	} else if r.SenderId != "" {
 
 		log.Infof("SenderId is required")
 
-	} else if nil != r.Destination && r.Destination != "" {
+	} else if r.Destination != "" {
 
 		log.Infof("Destination is required")
 
-	} else if nil != r.MessageContent && r.MessageContent != "" {
+	} else if r.MessageContent != "" {
 
 		log.Infof("Message Content is required")
 

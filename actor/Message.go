@@ -10,6 +10,8 @@ func init() {
 
 type MessageType int8
 
+
+
 const (
 	LATIN   MessageType = 0
 	UNICODE MessageType = 1

@@ -15,18 +15,18 @@ func NewMessageStatusV1RepoImpl() MessageStatusV1RepoImpl {
 
 }
 
-func (m *MessageStatusV1RepoImpl) SaveMessage(m actor.UserMessageStatusV1) (int, error) {
+func (m MessageStatusV1RepoImpl) SaveMessage(u actor.UserMessageStatusV1) (int, error) {
 	return 0, nil
 }
-func (m *MessageStatusV1RepoImpl) UpdateMessage(m actor.UserMessageStatusV1) (int, error) {
+func (m MessageStatusV1RepoImpl) UpdateMessage(u actor.UserMessageStatusV1) (int, error) {
 	return 0, nil
 }
-func (m *MessageStatusV1RepoImpl) IsMessageExist(id string) bool {
+func (m MessageStatusV1RepoImpl) IsMessageExist(id string) bool {
 	return false
 }
-func (m *MessageStatusV1RepoImpl) FindMessage(id string) (*actor.UserMessageStatusV1, error) {
+func (m MessageStatusV1RepoImpl) FindMessage(id string) (*actor.UserMessageStatusV1, error) {
 	return nil, nil
 }
-func (m *MessageStatusV1RepoImpl) FindMessages(limit int) []*actor.UserMessageStatusV1 {
+func (m MessageStatusV1RepoImpl) FindMessages(limit int) []*actor.UserMessageStatusV1 {
 	return nil
 }

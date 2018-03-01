@@ -8,7 +8,7 @@ type (
 		GenerateMessageId(r MessageRequest) string
 	}
 
-	Message struct {
+	message struct {
 		MessageStatusV1Repo MessageStatusv1Repository
 		MessageStatusRepo   MessageStatusRepository
 		MessageLogRepo      MessageLogRepository
@@ -31,7 +31,7 @@ func (f *factory) NewMessageUsecase() MessageUsecase {
 
 	messageInstaceOnce.Do(func() {
 
-		MessageUsecaseInstance = Message{
+		MessageUsecaseInstance = message{
 			MessageStatusRepo:   f.NewMessageStatusRepository(),
 			UserRepo:            f.NewUserRepository(),
 			SenderRepo:          f.NewSenderRepository(),

@@ -1,5 +1,5 @@
 [transaction]
-prefix=5GPI
+prefix="5GPI"
 
 
 [date]
@@ -12,6 +12,18 @@ count=5
 user="guest"
 password="guest"
 address="localhost"
-port="15672"
+port=5672
 [queue.exchange]
 name="IncomingExchange"
+
+
+[service]
+prefix="/smsapi/pages/"
+
+[db]
+driver="mysql"
+name="SMS_API_V2"
+user="root"
+password="1rstwap"
+port=3306
+address="127.0.0.1"

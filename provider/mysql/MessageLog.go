@@ -15,26 +15,26 @@ func NewMessageLogRepoImpl() MessageLogRepoImpl {
 
 }
 
-func (m *MessageLogRepoImpl) SaveMessageLog(m actor.UserMessageLog) (int, error) {
+func (m MessageLogRepoImpl) SaveMessageLog(u actor.UserMessageLog) (int, error) {
 	return 0, nil
 }
 
-func (m *MessageLogRepoImpl) UpdateMessageLog(m actor.UserMessageLog) (int, error) {
+func (m MessageLogRepoImpl) UpdateMessageLog(u actor.UserMessageLog) (int, error) {
 	return 0, nil
 }
 
-func (m *MessageLogRepoImpl) DeleteMessageLog(m actor.UserMessageLog) (int, error) {
+func (m MessageLogRepoImpl) DeleteMessageLog(u actor.UserMessageLog) (int, error) {
 	return 0, nil
 }
 
-func (m *MessageLogRepoImpl) IsMessageLogExist(id string) bool {
+func (m MessageLogRepoImpl) IsMessageLogExist(id string) bool {
 	return false
 }
 
-func (m *MessageLogRepoImpl) FindMessageLog(id string) (*actor.UserMessageLog, error) {
+func (m MessageLogRepoImpl) FindMessageLog(id string) (*actor.UserMessageLog, error) {
 	return nil, nil
 }
 
-func (m *MessageLogRepoImpl) FindMessagesLog(limit int) []*actor.UserMessageLog {
+func (m MessageLogRepoImpl) FindMessagesLog(limit int) []*actor.UserMessageLog {
 	return nil
 }

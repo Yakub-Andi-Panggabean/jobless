@@ -2,15 +2,11 @@ package actor
 
 import (
 	//"strconv"
-	"github.com/sirupsen/logrus"
+	logger "github.com/sirupsen/logrus"
 	"time"
 )
 
-var log logrus.Logger
-
 func init() {
-
-	log = logrus.New()
 
 }
 
@@ -63,7 +59,7 @@ func (u SmsApiUser) IsValidIp(ip string) bool {
 
 		if value == ip {
 
-			log.Debug("valid ip found at index :", index)
+			logger.Debug("valid ip found at index :", index)
 			isExist = true
 
 		}

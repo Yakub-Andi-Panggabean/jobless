@@ -4,21 +4,22 @@ import (
 	"github.com/spf13/viper"
 )
 
-var viperConfig viper.Viper
+var viperConfig *viper.Viper
 
 func init() {
 
 	viperConfig=viper.New()
-	viperConfig.SetConfigFile("application")
-	viperConfig.AddConfigPath("config/")
+	viperConfig.SetConfigType("toml")
+	viperConfig.SetConfigFile("./config/application.toml")
+	//viperConfig.AddConfigPath("./config")
 	err := viperConfig.ReadInConfig()
 	if err != nil {
-		panic("an error occurred when trying to read config file, error message :" + err)
+		panic("an error occurred when trying to read config file, error message :" + err.Error())
 	}
 
 }
 
-func GetConfig() viper.Viper {
+func GetConfig() *viper.Viper {
 
 	return viperConfig
 

@@ -3,12 +3,11 @@ package rabbitmq
 import (
 	"github.com/sirupsen/logrus"
 	"github.com/streadway/amqp"
-	"siji/sms-api/actor"
 	"siji/sms-api/util"
 	"strings"
 )
 
-var log logrus.Logger
+var log *logrus.Logger
 
 type (
 	MessagePublisher struct {
@@ -32,10 +31,9 @@ func init() {
 
 }
 
-func (m *MessagePublisher) Publish(message string, exchange string, exchangeType string) error {
+func (m MessagePublisher) Publish(message string, exchange string, exchangeType string) error {
 
 	var errorVal error
-	//exchangeName := util.GetConfig().GetString("queue.exchange.incoming")
 
 	channel, err := connection.Channel()
 
