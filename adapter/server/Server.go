@@ -27,6 +27,10 @@ func init() {
 
 	storageFactory := mysql.NewStorage()
 
+	if storageFactory == nil {
+		panic("nil storage factory")
+	}
+
 	usecaseFactory = usecase.New(publisher, storageFactory)
 
 }
