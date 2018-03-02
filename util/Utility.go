@@ -1,6 +1,8 @@
 package util
 
 import (
+	"crypto/md5"
+	"encoding/hex"
 	"encoding/json"
 	"github.com/sirupsen/logrus"
 )
@@ -27,5 +29,13 @@ func ConvertToJson(p interface{}) string {
 		return string(b)
 
 	}
+
+}
+
+func GetMd5Hash(text string) string {
+
+	hash := md5.New()
+	hash.Write([]byte(text))
+	return hex.EncodeToString(hash.Sum(nil))
 
 }

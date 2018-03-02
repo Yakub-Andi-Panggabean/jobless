@@ -1,29 +1,32 @@
 package mysql
 
 import (
+	"database/sql"
 	"siji/sms-api/actor"
 	"siji/sms-api/usecase"
 )
 
 type (
-	SenderRepoImpl struct {
+	senderRepoImpl struct {
 		usecase.SenderRepository
+		connection *sql.DB
 	}
 )
 
-func NewSenderRepoImpl() SenderRepoImpl {
+func NewSenderRepoImpl(db *sql.DB) usecase.SenderRepository {
 
-	var senderRepo SenderRepoImpl
+	var senderRepo senderRepoImpl
+	senderRepo.connection = db
 	return senderRepo
 
 }
 
-func (u SenderRepoImpl) UpdateSender(s actor.Sender) (int, error) {
+func (u senderRepoImpl) UpdateSender(s actor.Sender) (int, error) {
 	return 0, nil
 }
-func (u SenderRepoImpl) FindSender(id string) (*actor.Sender, error) {
-	return nil,nil
+func (u senderRepoImpl) FindSender(id string) (*actor.Sender, error) {
+	return nil, nil
 }
-func (u SenderRepoImpl) FindSenders(limit int) []*actor.Sender {
+func (u senderRepoImpl) FindSenders(limit int) []*actor.Sender {
 	return nil
 }

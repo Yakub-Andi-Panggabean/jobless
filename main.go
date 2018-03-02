@@ -31,7 +31,7 @@ func main() {
 
 	prefix := util.GetConfig().GetString("service.prefix")
 
-	log.Infof("prefix : %s",prefix)
+	log.Infof("prefix : %s", prefix)
 
 	router.HandleFunc("/", server.IndexHandler)
 	router.HandleFunc(prefix+versatile, server.IncomingSmsHandler)

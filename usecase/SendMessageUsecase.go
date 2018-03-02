@@ -62,7 +62,15 @@ func (m message) SendMessage(r MessageRequest) (string, error) {
 
 			} else {
 
-				transactionId = m.sendSmsV2(*sender, *user, r)
+				if &r == nil {
+					log.Error("r is nill")
+				} else if sender == nil {
+					log.Error("sender is nill")
+				} else if user == nil {
+					log.Error("user is nill")
+				} else {
+					transactionId = m.sendSmsV2(*sender, *user, r)
+				}
 
 			}
 		}
@@ -111,24 +119,26 @@ func (m message) sendSmsV1(sender actor.Sender, r MessageRequest) string {
 
 func (m message) sendSmsV2(sender actor.Sender, user actor.SmsApiUser, r MessageRequest) string {
 
-	statv2 := actor.UserMessageStatus{
-		Message:        r.MessageContent,
-		Type:           r.Type,
-		MessageId:      m.GenerateMessageId(r),
-		SenderId:       sender.SenderId,
-		Destination:    r.Destination,
-		Acknowledged:   false,
-		BroadcastSmsId: r.Broadcast.BroadcastSmsId,
-		MessageStatus:  "",
-		SentTime:       time.Now(),
-		UserId:         user.Username,
-	}
+	/*
+		statv2 := actor.UserMessageStatus{
+			Message:        r.MessageContent,
+			Type:           r.Type,
+			MessageId:      m.GenerateMessageId(r),
+			SenderId:       sender.SenderId,
+			Destination:    r.Destination,
+			Acknowledged:   false,
+			BroadcastSmsId: r.Broadcast.BroadcastSmsId,
+			MessageStatus:  "",
+			SentTime:       time.Now(),
+			UserId:         user.Username,
+		}
 
-	m.MessageStatusRepo.SaveMessage(statv2)
+		m.MessageStatusRepo.SaveMessage(statv2)
 
-	//will be put to queue later
-
-	return statv2.MessageId
+		//will be put to queue later
+		log.Info("message id :", statv2.MessageId)
+	*/
+	return "xxx"
 
 }
 

@@ -28,7 +28,6 @@ var (
 	messageLogRepositoryOnce          sync.Once
 )
 
-
 func NewStorage() usecase.StorageFactory {
 
 	var storage storageFactory
@@ -83,7 +82,7 @@ func (s *storageFactory) NewUserRepository() usecase.UserRepository {
 func (s *storageFactory) NewSenderRepository() usecase.SenderRepository {
 
 	senderRepositoryOnce.Do(func() {
-		senderRepositoryInstance = NewSenderRepoImpl()
+		senderRepositoryInstance = NewSenderRepoImpl(s.db)
 	})
 
 	return senderRepositoryInstance

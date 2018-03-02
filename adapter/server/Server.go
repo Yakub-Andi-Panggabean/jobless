@@ -18,6 +18,8 @@ var usecaseFactory usecase.Factory
 
 func init() {
 
+	log = logrus.New()
+
 	publisher := rabbitmq.MessagePublisher{
 		Password: util.GetConfig().GetString("queue.user"),
 		Username: util.GetConfig().GetString("queue.password"),
@@ -41,6 +43,10 @@ func IndexHandler(w http.ResponseWriter, r *http.Request) {
 }
 
 func IncomingSmsHandler(w http.ResponseWriter, r *http.Request) {
+
+	raw := r.URL.RawQuery
+
+	log.Info("incoming request : ", raw)
 
 	q := r.URL.Query()
 

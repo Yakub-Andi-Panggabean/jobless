@@ -23,7 +23,7 @@ prefix="/smsapi/pages/"
 [db]
 driver="mysql"
 name="SMS_API_V2"
-user="root"
-password="1rstwap"
+user="qateam"
+password="qateam"
 port=3306
-address="127.0.0.1"
+address="10.32.6.71"

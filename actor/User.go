@@ -22,7 +22,7 @@ type (
 	}
 
 	SmsApiUser struct {
-		Actor
+		//Actor
 		UserId            int
 		Version           int
 		Username          string
@@ -33,16 +33,20 @@ type (
 		SenderIds         []string
 		AuthorizedIPs     []string
 		VirtualNumber     []string
-		Cobrander         []string
+		Cobrander         string
 		DeliveryStatusUrl string
 		UrlInvalidCount   int
 		UrlActive         bool
 		UrlLastRetry      time.Time
 		IsUseBlackList    bool
 		IsPostPaidUser    bool
-		InactiveReason    bool
+		InactiveReason    string
 		TryCount          int
 		DateTimeTry       time.Time
+		CreatedDate       time.Time
+		UpdatedDate       time.Time
+		CreatedBy         int
+		UpdatedBy         int
 	}
 )
 
